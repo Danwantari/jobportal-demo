@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}html{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}</style>
+<title>Job Posting Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: a prototype guide on top (journey + next action), then one browser frame that swaps between three screens. */
+:root{
+  --bg:#f3f4f9;--surface:#ffffff;--ink:#1c2033;--muted:#646b85;--line:#e1e4ee;--soft:#eef0f7;
+  --plat:#5a3df0;--plat-soft:#ece8ff;--portal:#1f5cf0;--portal-soft:#e6eeff;
+  --ok:#0f8f5f;--ok-soft:#e5f6ee;--warn:#8a5a00;--warn-soft:#fff3d9;--bad:#c23b53;
+  --side:#171a33;--side-ink:#c8cbe6;--onaccent:#ffffff;
+  --font-text:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-head:'Space Grotesk','Inter',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1220;--surface:#181c30;--ink:#e8eaf6;--muted:#9aa1c0;--line:#2a2f4a;--soft:#20253d;
+  --plat:#9a88ff;--plat-soft:#2a2556;--portal:#6c97ff;--portal-soft:#1b2a55;
+  --ok:#3ccf94;--ok-soft:#12332a;--warn:#f0b84a;--warn-soft:#3a2e10;--bad:#ff7d93;
+  --side:#0c0e1c;--side-ink:#aab0d4;--onaccent:#10122a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1220;--surface:#181c30;--ink:#e8eaf6;--muted:#9aa1c0;--line:#2a2f4a;--soft:#20253d;
+  --plat:#9a88ff;--plat-soft:#2a2556;--portal:#6c97ff;--portal-soft:#1b2a55;
+  --ok:#3ccf94;--ok-soft:#12332a;--warn:#f0b84a;--warn-soft:#3a2e10;--bad:#ff7d93;
+  --side:#0c0e1c;--side-ink:#aab0d4;--onaccent:#10122a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-text);font-size:14px;line-height:1.5;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.page{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3,h4{font-family:var(--font-head);margin:0;text-wrap:balance}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--plat);outline-offset:2px}
+
+/* guide */
+.guide{display:flex;flex-direction:column;gap:12px}
+.gtop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.gtop h1{font-size:22px}
+.gtop p{margin:3px 0 0;color:var(--muted)}
+.journey{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.journey li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 11px;display:flex;gap:9px;align-items:center;color:var(--muted);min-width:0}
+.journey .n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:11px;font-weight:700}
+.journey .t{font-size:12.5px;font-weight:600;min-width:0}
+.journey li.now{border-color:var(--plat);color:var(--ink)}
+.journey li.now .n{background:var(--plat);color:var(--onaccent)}
+.journey li.done{color:var(--ink)}
+.journey li.done .n{background:var(--ok);color:var(--onaccent)}
+.next{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-weight:600}
+.next.fin{background:var(--ok-soft);color:var(--ok)}
+.next button{border:0;border-radius:8px;padding:7px 13px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--bg)}
+
+/* tabs + frame */
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:8px 14px;font-weight:600;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--ink)}
+.frame{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.chrome{display:flex;align-items:center;gap:12px;padding:9px 12px;background:var(--soft);border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:5px}.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.url{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:4px 10px;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* platform */
+.plat{display:flex;min-height:560px}
+.side{width:210px;flex:none;background:var(--side);color:var(--side-ink);padding:18px 12px}
+.logo{display:flex;gap:8px;align-items:center;font:700 17px var(--font-head);color:#fff;margin:0 8px 22px}
+.logo i{width:24px;height:24px;border-radius:7px;background:var(--plat);display:block}
+.side button{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:9px 11px;border-radius:8px;cursor:pointer;margin-bottom:3px;font-size:14px}
+.side button.on,.side button:hover{background:rgba(255,255,255,.1);color:#fff}
+.main{flex:1;min-width:0;padding:22px 26px 34px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.top h2{font-size:20px}.sub{color:var(--muted);margin:3px 0 0}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.tile{border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile small{display:block;color:var(--muted)}
+.tile b{font:700 18px var(--font-head);font-variant-numeric:tabular-nums}
+.tile.old b{color:var(--bad);text-decoration:line-through;text-decoration-thickness:1px}
+.tile.new b{color:var(--ok)}
+.steps{list-style:none;margin:0 0 14px;padding:0;display:flex;gap:6px;flex-wrap:wrap}
+.steps li{flex:1;min-width:120px;border:1px solid var(--line);border-radius:9px;padding:8px 12px;color:var(--muted);font-weight:600;font-size:13px}
+.steps li.on{color:var(--ink);border-color:var(--plat)}
+.steps li.done{color:var(--ok)}
+.demo{background:var(--warn-soft);color:var(--warn);border-radius:9px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+.card{border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:12px;background:var(--surface)}
+.card h3{font-size:15px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.span2{grid-column:span 2}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-weight:600;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font:inherit;color:var(--ink);background:var(--surface)}
+textarea{resize:vertical;line-height:1.55;min-height:84px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--plat);outline-offset:0;border-color:var(--plat)}
+.hint{color:var(--muted);font-size:12px;margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:6px;border:1px solid var(--line);border-radius:8px}
+.chip{background:var(--plat-soft);color:var(--plat);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;display:flex;gap:6px;align-items:center}
+.chip button{background:none;border:0;color:inherit;cursor:pointer;font-size:14px;padding:0;line-height:1}
+.chips input{border:0;flex:1;min-width:110px;padding:3px 4px}
+.chips input:focus{outline:none}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+.btn{border:0;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer}
+.btn.p{background:var(--plat);color:var(--onaccent)}
+.btn.b{background:var(--portal);color:var(--onaccent)}
+.btn.g{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.ai{display:inline-block;background:var(--plat-soft);color:var(--plat);border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:6px;font-family:var(--font-text)}
+.aistep{display:flex;gap:10px;align-items:center;padding:7px 0;color:var(--muted)}
+.aistep .d{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;flex:none}
+.aistep.run{color:var(--ink)}.aistep.run .d{border-color:var(--plat);border-top-color:transparent;animation:sp .7s linear infinite}
+.aistep.ok{color:var(--ink)}.aistep.ok .d{background:var(--ok);border-color:var(--ok);color:var(--onaccent)}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.aistep.run .d{animation:none}}
+.note{background:var(--ok-soft);color:var(--ok);border-radius:8px;padding:9px 12px;margin-top:10px;font-size:12.5px}
+.pv h3{font-size:20px}
+.meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);margin:8px 0 12px}
+.tag{display:inline-block;background:var(--soft);border-radius:6px;padding:2px 9px;margin:2px 4px 2px 0;font-size:12px}
+.pv h4{margin:14px 0 5px;font-size:14px}.pv ul{margin:0;padding-left:20px;line-height:1.7}
+.check{list-style:none;margin:0;padding:0}.check li{padding:3px 0}
+.check li:before{content:"\2713";color:var(--ok);font-weight:800;margin-right:8px}
+.check li.miss:before{content:"!";color:var(--bad)}
+.success{text-align:center;padding:30px 18px}
+.success h3{font-size:20px;margin-bottom:6px}
+.pill{background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;background:var(--soft)}
+.empty{text-align:center;color:var(--muted);padding:34px 10px}
+
+/* portal */
+.portal{min-height:560px;background:var(--bg)}
+.phd{background:var(--surface);border-bottom:1px solid var(--line);padding:11px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{font:800 21px var(--font-head);color:var(--portal);cursor:pointer;background:none;border:0;padding:0}
+.brand span{color:#ff7a59}
+.search{flex:1;min-width:220px;display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.search input{border:0;border-radius:0;padding:9px 14px;min-width:0}
+.search input:focus{outline:none}
+.search input+input{border-left:1px solid var(--line);flex:.7}
+.search button{border:0;background:var(--portal);color:var(--onaccent);padding:0 18px;font-weight:700;cursor:pointer}
+.pw{padding:18px 22px 34px;max-width:980px;margin:0 auto}
+.count{color:var(--muted);margin:0 0 12px}
+.job{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px;cursor:pointer;display:block;width:100%;text-align:left;color:inherit}
+.job:hover{border-color:var(--portal)}
+.job h3{font-size:17px;margin-bottom:2px}.job:hover h3{color:var(--portal)}
+.co{color:var(--muted);margin-bottom:8px}
+.via{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:1px 8px;font-size:12px;font-weight:600}
+.via.me{background:var(--ok-soft);color:var(--ok)}
+.jr{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;color:var(--muted);font-size:12px}
+.back{background:none;border:0;color:var(--portal);font-weight:600;cursor:pointer;padding:0;margin-bottom:12px}
+.detail{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px;align-items:start}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px}
+.pc h1{font-size:24px;margin-bottom:2px}.pc h2{font-size:15px;margin-bottom:8px}
+.pc p{margin:0;line-height:1.7}.pc ul{margin:0;padding-left:20px;line-height:1.75}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.kv span:first-child{color:var(--muted)}.kv span:last-child{text-align:right}
+.sal{font:700 18px var(--font-head);margin:6px 0 10px}
+.modal{position:fixed;inset:0;background:rgba(10,12,28,.6);display:grid;place-items:center;z-index:20;padding:16px}
+.panel{background:var(--surface);color:var(--ink);border-radius:14px;max-width:540px;width:100%;max-height:92vh;overflow:auto;padding:22px}
+.panel label{margin-top:10px}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--muted)}
+.drop.has{border-style:solid;border-color:var(--ok);color:var(--ok);background:var(--ok-soft);font-weight:600}
+.err{color:var(--bad);min-height:18px;margin-top:8px;font-size:13px}
+
+@media (max-width:820px){
+  .journey{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .plat{flex-direction:column}.side{width:auto;display:flex;gap:6px;align-items:center;padding:10px;flex-wrap:wrap}.logo{margin:0 8px 0 0}.side button{width:auto;margin:0}
+  .main{padding:16px}.tiles,.grid,.two{grid-template-columns:1fr}.span2{grid-column:auto}
+  .detail{grid-template-columns:1fr}.pw{padding:14px}
+}
+</style>
+</head><body>
+<div style="padding:8px 16px;text-align:center;background:#fff3cc;color:#493600;font:13px sans-serif">Prototype only: simulated AI and fictional jobs. Use synthetic candidate details and resumes only.</div>
+
+<div class="page">
+  <section class="guide">
+    <div class="gtop">
+      <div><h1>AI job posting, clickable prototype</h1><p>Sample data throughout. Follow the five steps, or jump to any screen.</p></div>
+      <button class="btn g" id="reset">Reset demo</button>
+    </div>
+    <ol class="journey" id="journey"></ol>
+    <div class="next" id="next"></div>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="plat" aria-selected="true">Recruiter · HireCloud</button>
+    <button class="tab" role="tab" data-tab="portal" aria-selected="false">Candidate · JobHub career portal</button>
+    <button class="tab" role="tab" data-tab="apps" aria-selected="false">Recruiter · Applications</button>
+  </div>
+
+  <div class="frame">
+    <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><div class="url" id="url">hirecloud.demo/jobs/new</div></div>
+
+    <!-- RECRUITER: CREATE JOB -->
+    <div class="plat" id="v-plat">
+      <aside class="side">
+        <div class="logo"><i></i>HireCloud</div>
+        <button class="on" data-go="plat">Create job</button>
+        <button data-go="apps">Applications</button>
+        <button data-go="portal">Career portal &#8599;</button>
+      </aside>
+      <div class="main">
+        <div class="top"><div><h2>Create a job</h2><p class="sub">Give AI the basics. It drafts the rest. You review and publish.</p></div></div>
+        <div class="tiles">
+          <div class="tile old"><small>Typical manual effort</small><b>~45 min</b></div>
+          <div class="tile new"><small>Time on this job so far</small><b id="clock">0:00</b></div>
+          <div class="tile"><small>Fields typed by hand</small><b>3 of 17</b></div>
+        </div>
+        <ol class="steps" id="psteps"><li>Brief</li><li>AI draft and review</li><li>Preview and publish</li></ol>
+
+        <section id="p1">
+          <div class="demo"><b>Demo mode:</b> every field is pre-filled so you can click straight through. Edit anything you like.</div>
+          <div class="card"><h3>Role basics</h3>
+            <div class="grid">
+              <div><label for="title">Job title</label><input id="title" value="Business Analyst"></div>
+              <div><label for="company">Company</label><input id="company" value="Bright Retail Solutions"></div>
+              <div><label for="department">Department</label><input id="department" value="Operations &amp; Strategy"></div>
+              <div><label for="location">Location</label><input id="location" value="Hyderabad, Telangana"></div>
+              <div><label for="workMode">Work mode</label><select id="workMode"><option>On-site</option><option>Hybrid</option><option>Remote</option></select></div>
+              <div><label for="employmentType">Employment type</label><select id="employmentType"><option>Full-time</option><option>Part-time</option><option>Contract</option></select></div>
+              <div><label for="shift">Shift</label><select id="shift"><option>General shift (9:30 AM to 6:30 PM, Mon to Fri)</option><option>Rotational shift</option><option>Night shift</option></select></div>
+              <div><label for="experience">Experience</label><input id="experience" value="3-6 years"></div>
+              <div><label for="openings">Openings</label><input id="openings" type="number" min="1" value="2"></div>
+              <div><label for="closingDate">Apply by</label><input id="closingDate" type="date"></div>
+              <div class="span2"><label for="skillIn">Key skills (press Enter to add)</label><div class="chips" id="chips"></div></div>
+            </div>
+          </div>
+          <div class="card"><h3>Anything else AI should know?<span class="ai">Demo prompt</span></h3>
+            <textarea id="prompt" aria-label="Prompt for AI"></textarea>
+            <div class="hint">Short and rough is fine. This is the only free text you write.</div>
+          </div>
+          <div class="row"><span></span><button class="btn p" id="gen">&#10024; Generate with AI &rarr;</button></div>
+        </section>
+
+        <section id="p2" hidden>
+          <div class="card" id="aiRun" hidden><h3>AI is drafting your job post</h3><div id="aiSteps"></div></div>
+          <div id="draft" hidden>
+            <div class="card"><h3>Job description<span class="ai">AI drafted</span></h3>
+              <textarea id="description" style="min-height:120px" aria-label="Job description"></textarea>
+              <div class="row"><span class="hint">Want a different take?</span><button class="btn g" id="regen">&#8635; Regenerate</button></div></div>
+            <div class="card"><h3>Roles and responsibilities<span class="ai">AI drafted</span></h3>
+              <textarea id="responsibilities" style="min-height:180px" aria-label="Responsibilities"></textarea><div class="hint">One per line.</div></div>
+            <div class="card"><div class="two">
+              <div><h3>Requirements<span class="ai">AI drafted</span></h3><textarea id="requirements" style="min-height:130px" aria-label="Requirements"></textarea></div>
+              <div><h3>Nice to have<span class="ai">AI drafted</span></h3><textarea id="niceToHave" style="min-height:130px" aria-label="Nice to have"></textarea></div>
+              <div><h3>Benefits<span class="ai">AI drafted</span></h3><textarea id="benefits" style="min-height:96px" aria-label="Benefits"></textarea></div>
+              <div><h3>Salary, INR LPA<span class="ai">AI suggested</span></h3>
+                <div class="two"><div><label for="salaryMin">Min</label><input id="salaryMin" type="number" step="0.5"></div><div><label for="salaryMax">Max</label><input id="salaryMax" type="number" step="0.5"></div></div>
+                <div class="note" id="salNote"></div></div>
+            </div></div>
+            <div class="row"><button class="btn g" id="back2">&larr; Back</button><button class="btn p" id="next2">Next: preview &rarr;</button></div>
+          </div>
+        </section>
+
+        <section id="p3" hidden>
+          <div id="pubView">
+            <div class="card"><h3>This is how candidates will see it</h3><div class="pv" id="preview"></div></div>
+            <div class="card"><h3>Ready to publish?</h3><ul class="check" id="checklist"></ul>
+              <div class="hint" style="margin-top:8px">Publishing adds this job to the candidate portal tab in this demo.</div></div>
+            <div class="err" id="perr"></div>
+            <div class="row"><button class="btn g" id="back3">&larr; Back</button><button class="btn p" id="publish">Publish to career portal</button></div>
+          </div>
+          <div class="card success" id="done" hidden>
+            <h3>Job published</h3><p class="sub" id="doneMsg"></p>
+            <div class="row" style="justify-content:center;margin-top:14px"><button class="btn b" id="toPortal">View on career portal &#8599;</button></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- CANDIDATE: CAREER PORTAL -->
+    <div class="portal" id="v-portal" hidden>
+      <div class="phd">
+        <button class="brand" id="brand">job<span>hub</span></button>
+        <div class="search"><input id="q" placeholder="Job title, skills or company" aria-label="Search jobs"><input id="loc" placeholder="Location" aria-label="Location"><button id="go">Search</button></div>
+      </div>
+      <div class="pw" id="pview"></div>
+    </div>
+
+    <!-- RECRUITER: APPLICATIONS -->
+    <div class="plat" id="v-apps" hidden>
+      <aside class="side">
+        <div class="logo"><i></i>HireCloud</div>
+        <button data-go="plat">Create job</button>
+        <button class="on" data-go="apps">Applications</button>
+        <button data-go="portal">Career portal &#8599;</button>
+      </aside>
+      <div class="main">
+        <div class="top"><div><h2>Applications</h2><p class="sub">Candidates who applied on the career portal.</p></div></div>
+        <div class="tiles" id="astats" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+        <div class="card"><h3>Your jobs</h3><div class="tw" id="ajobs"></div></div>
+        <div class="card"><h3>Candidates</h3><div class="tw" id="aapps"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden><div class="panel" id="panel"></div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>{const d=document.createElement('div');d.textContent=s==null?'':s;return d.innerHTML};
+const DEFAULT_SKILLS=['Requirements gathering','Workflow design','Process mapping','SQL','Excel','Stakeholder management'];
+const DEMO_PROMPT='We are an SMB with about 120 employees moving from spreadsheets and WhatsApp follow-ups to automated workflows. The analyst will talk to Sales, Finance, HR and Ops teams, capture their requirements, create workflows, and work out the jobs each team needs done. Candidate should be comfortable with SQL/Excel and process mapping.';
+let stage=1,skills=[...DEFAULT_SKILLS],variant=0,t0=Date.now(),tEnd=null,pstep=1,tab='plat',jobs=[],apps=[],myJob=null,resume=null,busy=false;
+
+const H={'Content-Type':'application/json'};
+const SAMPLE_RESUME_B64='JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tCjEgMCBvYmoKPDwKL0YxIDIgMCBSCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMSAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL0NvbnRlbnRzIDcgMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUgODQyIF0gL1BhcmVudCA2IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNiAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0F1dGhvciAoYW5vbnltb3VzKSAvQ3JlYXRpb25EYXRlIChEOjIwMjYxMTEzMTQxODU2KzAwJzAwJykgL0NyZWF0b3IgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyNjExMTMxNDE4NTYrMDAnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAKICAvU3ViamVjdCAodW5zcGVjaWZpZWQpIC9UaXRsZSAoU3ludGhldGljIHNhbXBsZSByZXN1bWUpIC9UcmFwcGVkIC9GYWxzZQo+PgplbmRvYmoKNiAwIG9iago8PAovQ291bnQgMSAvS2lkcyBbIDMgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDI5Ngo+PgpzdHJlYW0KR2FybztiPixyLyY0UT9sTVJzISpLYnQuM1hJckhvPENkXSReclZxUCMhW18sODwoUi4xSkx1VVRecDBeWC1uJEAnSDI3M3FNYmEyKVY2VkxsMztQPltCLF9BPkFXcHVFcVMxNWYzbjl1NV5RYHUjNzteN1NLYmVxTmhJSCY9RylXXktWP2NHTlhCLFtJbUBCPjZiL2c8MWY8TytuVk49ZkhjTk9OP0FSbmpnVj5nOjREckMpNFIlIzlbRjZ1J1ZmYVVWVTQoY3NmR2tANCRBbE0lUyhNZDEpMS5OQFA3QEJyST5bMF9uQzcxRmVFN2pzbSpIISwrZ25ZUmZJMlkkY1c3VEFDOnFPZiZ0QHJLRk9uZzwkU2I1PSNMQGwnPVNyLzY3O210fj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA4CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA3MyAwMDAwMCBuIAowMDAwMDAwMTA0IDAwMDAwIG4gCjAwMDAwMDAyMTEgMDAwMDAgbiAKMDAwMDAwMDQwNCAwMDAwMCBuIAowMDAwMDAwNDcyIDAwMDAwIG4gCjAwMDAwMDA3ODMgMDAwMDAgbiAKMDAwMDAwMDg0MiAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzw2YzVkNmY3MGY3Y2VlYTMwY2Y2MzM5NzE3OWFhZGEyND48NmM1ZDZmNzBmN2NlZWEzMGNmNjMzOTcxNzlhYWRhMjQ+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAoaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tKQoKL0luZm8gNSAwIFIKL1Jvb3QgNCAwIFIKL1NpemUgOAo+PgpzdGFydHhyZWYKMTIyOAolJUVPRgo=';
+let cloudMode=false;
+const configReady=fetch('/api/config').then(r=>r.json()).then(c=>{cloudMode=c.storage==='supabase'});
+async function api(path,opts){const r=await fetch(path,opts);const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Request failed');return d}
+async function refresh(){const r=await Promise.all([api('/api/jobs'),api('/api/applications')]);jobs=r[0];apps=r[1];apps.forEach(a=>a.appliedAt=new Date(a.appliedAt))}
+const fileB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
+/* ---------- guide ---------- */
+const J=['Brief','AI draft','Publish','Candidate applies','Recruiter reviews'];
+function renderGuide(){
+  $('journey').innerHTML=J.map((t,i)=>{const n=i+1,c=stage>n?'done':stage===n?'now':'';return `<li class="${c}"><span class="n">${stage>n?'&#10003;':n}</span><span class="t">${t}</span></li>`}).join('');
+  const msg={1:['Step 1: review the pre-filled brief, then click Generate with AI.',null],2:['Step 2: read the AI draft, edit if you like, then click Next.',null],3:['Step 3: check the preview and publish to the career portal.',null],
+    4:['Step 4: switch to the candidate side and apply for the job.','portal'],5:['Step 5: switch to the recruiter side to see the application.','apps'],6:['That is the full journey. Reset the demo to run it again.',null]}[stage];
+  const el=$('next');el.className='next'+(stage===6?' fin':'');
+  el.innerHTML=`<span>${msg[0]}</span>`+(msg[1]?`<button id="nbtn">Take me there</button>`:'');
+  if(msg[1])$('nbtn').onclick=()=>{msg[1]==='portal'?openPortalJob():show('apps')};
+}
+function advance(to){if(to>stage){stage=to;renderGuide()}}
+
+/* ---------- tabs ---------- */
+const URLS={plat:'hirecloud.demo/jobs/new',portal:'jobhub.demo/jobs',apps:'hirecloud.demo/applications'};
+function show(t){
+  tab=t;['plat','portal','apps'].forEach(k=>$('v-'+k).hidden=k!==t);
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  $('url').textContent=URLS[t];
+  if(t==='portal')refresh().then(renderPortal).catch(renderPortal);
+  if(t==='apps'){advance(stage===5?6:stage);refresh().then(renderApps).catch(renderApps)}
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(b.dataset.tab));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+/* ---------- recruiter: create job ---------- */
+setInterval(()=>{const s=Math.floor(((tEnd||Date.now())-t0)/1000);$('clock').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},1000);
+function renderChips(){
+  const box=$('chips');box.innerHTML='';
+  skills.forEach((s,i)=>{const c=document.createElement('span');c.className='chip';c.textContent=s;const b=document.createElement('button');b.textContent='×';b.setAttribute('aria-label','Remove '+s);b.onclick=()=>{skills.splice(i,1);renderChips()};c.appendChild(b);box.appendChild(c)});
+  const inp=document.createElement('input');inp.id='skillIn';inp.placeholder='Add skill';
+  inp.onkeydown=e=>{if(e.key==='Enter'&&inp.value.trim()){e.preventDefault();skills.push(inp.value.trim());renderChips();$('skillIn').focus()}};
+  box.appendChild(inp);
+}
+function setPStep(n){
+  pstep=n;[1,2,3].forEach(i=>$('p'+i).hidden=i!==n);
+  [...$('psteps').children].forEach((li,i)=>li.className=i+1===n?'on':i+1<n?'done':'');
+}
+function brief(){return{title:$('title').value.trim(),company:$('company').value.trim(),department:$('department').value.trim(),location:$('location').value.trim(),workMode:$('workMode').value,employmentType:$('employmentType').value,shift:$('shift').value,experience:$('experience').value.trim(),openings:+$('openings').value||1,closingDate:$('closingDate').value,skills:[...skills]}}
+
+/* Simulated AI. Replace this one function with a real model call later. */
+function fakeAI(b,v){
+  const t=b.title,co=b.company,loc=b.location.split(',')[0];
+  const desc=[
+    `${co} is a growing business of about 120 people that is moving from spreadsheets and manual follow-ups to automated, workflow-driven operations. We are looking for a ${t} to sit between our teams and our technology: understand how work really gets done, capture it as clear requirements, and turn it into workflows people actually use. This is a hands-on, ${b.workMode.toLowerCase()} role in ${loc} with direct access to leadership and a clear path into product or operations leadership.`,
+    `${co} is automating how its teams work, and we need a ${t} in ${loc} to lead it. You will talk to Sales, Finance, HR and Ops, document what they need, and design the workflows that replace spreadsheets. Small team, big visibility.`][v%2];
+  return{description:desc,
+    responsibilities:['Meet Sales, Finance, HR and Operations teams to understand current processes and pain points','Capture and document business requirements, user stories and acceptance criteria','Map as-is processes and design to-be workflows using flowcharts or BPMN','Define the jobs to be done for each team and prioritise them with leadership','Work with developers and vendors to configure automations and approval workflows','Run UAT, train users and track adoption after go-live','Build reports and dashboards (SQL, Excel) to measure time saved and process KPIs','Maintain process documentation as the single source of truth'].join('\n'),
+    requirements:[`${b.experience} of experience as a Business Analyst or in a similar role`,'Strong requirements gathering and documentation skills (BRD, user stories)','Hands-on experience with process mapping and workflow design','Working knowledge of SQL and advanced Excel','Excellent communication and stakeholder management',"Bachelor's degree in Business, Engineering, IT or a related field"].join('\n'),
+    niceToHave:['Experience with workflow or low-code tools (Zoho, Power Automate, Jira)','Exposure to SMB or fast-growing company environments','CBAP or PMI-PBA certification'].join('\n'),
+    benefits:['Health insurance for you and family','Learning and certification budget','Fast growth path to Senior BA and Product roles'].join('\n'),
+    salaryMin:8,salaryMax:14,salNote:`Based on 214 similar ${t} roles in ${loc} (sample data): median 10.5 LPA, middle half 8 to 14 LPA. Showing a range typically brings about 30% more applications.`};
+}
+const AISTEPS=['Reading your brief and prompt','Drafting the job description','Listing responsibilities for the role','Setting requirements from skills and experience','Benchmarking salary for Hyderabad'];
+async function runAI(){
+  if(busy)return;const b=brief();
+  if(!b.title||!b.company||!b.location){$('title').focus();return}
+  busy=true;setPStep(2);advance(2);$('draft').hidden=true;$('aiRun').hidden=false;
+  const box=$('aiSteps');box.innerHTML='';
+  const els=AISTEPS.map(s=>{const d=document.createElement('div');d.className='aistep';d.innerHTML='<span class="d"></span><span></span>';d.lastChild.textContent=s;box.appendChild(d);return d});
+  for(const e of els){e.className='aistep run';await new Promise(r=>setTimeout(r,560));e.className='aistep ok';e.firstChild.textContent='✓'}
+  const d=fakeAI(b,variant);
+  ['description','responsibilities','requirements','niceToHave','benefits','salaryMin','salaryMax'].forEach(k=>$(k).value=d[k]);
+  $('salNote').textContent=d.salNote;$('aiRun').hidden=true;$('draft').hidden=false;busy=false;
+}
+$('gen').onclick=()=>{variant=0;runAI()};
+$('regen').onclick=()=>{variant++;runAI()};
+$('back2').onclick=()=>setPStep(1);$('back3').onclick=()=>setPStep(2);
+const lines=id=>$(id).value.split('\n').map(s=>s.trim()).filter(Boolean);
+const li=a=>a.map(x=>'<li>'+esc(x)+'</li>').join('');
+function jobData(){return{...brief(),description:$('description').value.trim(),responsibilities:lines('responsibilities'),requirements:lines('requirements'),niceToHave:lines('niceToHave'),benefits:lines('benefits'),salaryMin:+$('salaryMin').value,salaryMax:+$('salaryMax').value}}
+$('next2').onclick=()=>{
+  const j=jobData();
+  $('preview').innerHTML=`<h3>${esc(j.title)}</h3><div>${esc(j.company)}</div>
+    <div class="meta"><span>${esc(j.experience)}</span><span>₹ ${j.salaryMin}-${j.salaryMax} LPA</span><span>${esc(j.location)}</span><span>${esc(j.shift.split(' (')[0])}</span><span>${esc(j.workMode)} · ${esc(j.employmentType)}</span></div>
+    <div>${j.skills.map(s=>'<span class="tag">'+esc(s)+'</span>').join('')}</div>
+    <h4>Job description</h4><p>${esc(j.description)}</p><h4>Roles and responsibilities</h4><ul>${li(j.responsibilities)}</ul><h4>Requirements</h4><ul>${li(j.requirements)}</ul>`;
+  const c=[['Job title, company and location',j.title&&j.company&&j.location],['Description written',j.description.length>40],['Responsibilities listed',j.responsibilities.length>0],['Requirements listed',j.requirements.length>0],['Salary range visible to candidates',j.salaryMin>0&&j.salaryMax>=j.salaryMin],['Skills added',j.skills.length>0],['Closing date set',!!j.closingDate]];
+  $('checklist').innerHTML=c.map(([t,ok])=>`<li class="${ok?'':'miss'}">${t}${ok?'':' (missing)'}</li>`).join('');
+  $('publish').disabled=c.some(x=>!x[1]);setPStep(3);advance(3);
+};
+$('publish').onclick=async()=>{
+  const btn=$('publish');btn.disabled=true;$('perr').textContent='';
+  try{
+    const c=await api('/api/jobs',{method:'POST',headers:H,body:JSON.stringify(jobData())});
+    myJob=await api('/api/jobs/'+c.id+'/publish',{method:'POST'});await refresh();
+  }catch(e){$('perr').textContent='Could not publish: '+e.message;btn.disabled=false;return}
+  tEnd=Date.now();const s=Math.round((tEnd-t0)/1000);
+  $('pubView').hidden=true;$('done').hidden=false;
+  $('doneMsg').textContent=`Created and published in ${Math.floor(s/60)}m ${s%60}s instead of about 45 minutes.`;
+  [...$('psteps').children].forEach(l=>l.className='done');advance(4);
+};
+$('toPortal').onclick=openPortalJob;
+
+/* ---------- candidate: career portal ---------- */
+const sal=j=>(j.salaryMin&&j.salaryMax)?`₹ ${j.salaryMin}-${j.salaryMax} LPA`:'Not disclosed';
+const dago=iso=>{const d=Math.max(0,Math.floor((Date.now()-new Date(iso))/864e5));return d===0?'Today':d===1?'1 day ago':d+' days ago'};
+const via=j=>`<span class="via ${j.source==='HireCloud'?'me':''}">via ${esc(j.source)}</span>`;
+const ul=a=>'<ul>'+(a||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+let openId=null;
+function renderPortal(){openId?renderDetail(openId):renderList()}
+function renderList(){
+  const q=$('q').value.toLowerCase().trim(),l=$('loc').value.toLowerCase().trim();
+  const rows=jobs.filter(j=>(!q||(j.title+' '+j.company+' '+j.skills.join(' ')).toLowerCase().includes(q))&&(!l||j.location.toLowerCase().includes(l)));
+  $('pview').innerHTML=`<p class="count">${rows.length} job${rows.length===1?'':'s'} found</p>`+(rows.map(j=>`<button class="job" data-id="${j.id}"><h3>${esc(j.title)}</h3><div class="co">${esc(j.company)}</div>
+    <div class="meta"><span>${esc(j.experience)}</span><span>${sal(j)}</span><span>${esc(j.location)}</span></div>
+    <div>${j.skills.slice(0,6).map(s=>'<span class="tag">'+esc(s)+'</span>').join('')}</div>
+    <div class="jr"><span>${dago(j.publishedAt)}</span>${via(j)}</div></button>`).join('')||'<div class="empty">No jobs match your search.</div>');
+  $('pview').querySelectorAll('.job').forEach(b=>b.onclick=()=>{openId=b.dataset.id;renderDetail(openId)});
+}
+function renderDetail(id){
+  const j=jobs.find(x=>x.id===id);if(!j){openId=null;return renderList()}
+  $('pview').innerHTML=`<button class="back" id="bk">&larr; All jobs</button><div class="detail"><div>
+    <div class="pc"><h1>${esc(j.title)}</h1><div class="co">${esc(j.company)}</div>
+      <div class="meta"><span>${esc(j.experience)}</span><span>${sal(j)}</span><span>${esc(j.location)}</span></div>
+      <div class="jr" style="margin:0 0 12px"><span>Posted ${dago(j.publishedAt)} · Openings: ${j.openings}</span>${via(j)}</div>
+      <button class="btn b" data-apply>Apply now</button></div>
+    <div class="pc"><h2>Job description</h2><p>${esc(j.description)}</p></div>
+    <div class="pc"><h2>Roles and responsibilities</h2>${ul(j.responsibilities)}</div>
+    <div class="pc"><h2>Requirements</h2>${ul(j.requirements)}</div>
+    ${(j.niceToHave||[]).length?`<div class="pc"><h2>Nice to have</h2>${ul(j.niceToHave)}</div>`:''}
+    ${(j.benefits||[]).length?`<div class="pc"><h2>Perks and benefits</h2>${ul(j.benefits)}</div>`:''}
+    <div class="pc"><h2>Key skills</h2>${j.skills.map(s=>'<span class="tag">'+esc(s)+'</span>').join('')}</div></div>
+    <div class="pc"><h2>Job highlights</h2><div class="sal">${sal(j)}</div>
+      <div class="kv"><span>Location</span><span>${esc(j.location)}</span></div><div class="kv"><span>Work mode</span><span>${esc(j.workMode)}</span></div>
+      <div class="kv"><span>Job type</span><span>${esc(j.employmentType)}</span></div><div class="kv"><span>Shift</span><span>${esc((j.shift||'').split(' (')[0])}</span></div>
+      <div class="kv"><span>Department</span><span>${esc(j.department)}</span></div>${j.closingDate?`<div class="kv"><span>Apply by</span><span>${esc(j.closingDate)}</span></div>`:''}
+      <button class="btn b" style="width:100%;margin-top:12px" data-apply>Apply now</button></div></div>`;
+  $('bk').onclick=()=>{openId=null;renderList()};
+  $('pview').querySelectorAll('[data-apply]').forEach(b=>b.onclick=()=>openApply(j));
+}
+function openPortalJob(){if(myJob)openId=myJob.id;show('portal')}
+$('brand').onclick=()=>{openId=null;renderPortal()};
+const doSearch=()=>{openId=null;renderList()};
+$('go').onclick=doSearch;['q','loc'].forEach(id=>$(id).onkeydown=e=>{if(e.key==='Enter')doSearch()});
+
+function openApply(j){
+  resume=null;
+  $('panel').innerHTML=`<h2 style="font-size:19px">Apply for ${esc(j.title)}</h2><div class="co">${esc(j.company)} · ${esc(j.location)}</div>
+    <label for="a_name">Full name *</label><input id="a_name" value="Ananya Rao">
+    <div class="two"><div><label for="a_email">Email *</label><input id="a_email" type="email" value="ananya.rao@example.com"></div><div><label for="a_phone">Phone *</label><input id="a_phone" value="98765 43210"></div></div>
+    <div class="two"><div><label for="a_company">Current company</label><input id="a_company" value="Zenith Retail"></div><div><label for="a_exp">Total experience</label><input id="a_exp" value="4 years"></div></div>
+    <label for="a_notice">Notice period</label><select id="a_notice"><option>Immediate</option><option>15 days</option><option selected>30 days</option><option>60 days</option><option>90 days</option></select>
+    <label>Resume * (PDF, DOC or DOCX, up to 5 MB)</label>
+    <div class="drop" id="drop">No file chosen</div>
+    <div class="row" style="justify-content:flex-start;gap:8px"><input id="a_file" type="file" accept=".pdf,.doc,.docx" aria-label="Choose resume file" style="max-width:230px"><button class="btn g" id="sample" type="button">Use sample resume</button></div>
+    <label for="a_note">Cover note (optional)</label><textarea id="a_note" rows="2"></textarea>
+    <div class="err" id="err"></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn g" id="cancel">Cancel</button><button class="btn b" id="submit">Submit application</button></div>`;
+  $('modal').hidden=false;
+  const set=(n,sz,f)=>{resume={name:n,size:sz,file:f};$('err').textContent='';$('drop').className='drop has';$('drop').textContent='✓ '+n+' ('+Math.max(1,Math.round(sz/1024))+' KB)'};
+  $('sample').onclick=()=>set('Ananya_Rao_Resume.pdf',atob(SAMPLE_RESUME_B64).length);
+  $('a_file').onchange=e=>{const f=e.target.files[0];if(!f)return;const x=f.name.split('.').pop().toLowerCase();
+    if(!['pdf','doc','docx'].includes(x)){resume=null;$('drop').textContent='No valid file chosen';$('err').textContent='Resume must be PDF, DOC or DOCX.';return}
+    if(f.size>5*1024*1024){resume=null;$('drop').textContent='No valid file chosen';$('err').textContent='Resume must be under 5 MB.';return}set(f.name,f.size,f)};
+  $('cancel').onclick=()=>$('modal').hidden=true;
+  $('submit').onclick=async()=>{
+    const v=id=>$(id).value.trim();
+    if(!v('a_name')||!/^\S+@\S+\.\S+$/.test(v('a_email'))||!v('a_phone')){$('err').textContent='Enter your name, a valid email and a phone number.';return}
+    if(!resume){$('err').textContent='Upload your resume, or use the sample resume.';return}
+    $('submit').disabled=true;$('submit').textContent='Submitting...';
+    let a;
+    try{
+      await configReady;
+      let upload={};
+      if(cloudMode){
+        const ticket=await api('/api/upload-url',{method:'POST',headers:H,body:JSON.stringify({name:resume.name,size:resume.size})});
+        const blob=resume.file||new Blob([Uint8Array.from(atob(SAMPLE_RESUME_B64),c=>c.charCodeAt(0))],{type:'application/pdf'});
+        const r=await fetch(ticket.uploadUrl,{method:'PUT',headers:{'Content-Type':blob.type||'application/octet-stream'},body:blob});
+        if(!r.ok)throw new Error('Resume upload failed. Please try again.');
+        upload={resumeFile:ticket.path};
+      }else{upload={resumeData:resume.file?await fileB64(resume.file):SAMPLE_RESUME_B64}}
+      a=await api('/api/apply',{method:'POST',headers:H,body:JSON.stringify({jobId:j.id,name:v('a_name'),email:v('a_email'),phone:v('a_phone'),company:v('a_company'),experience:v('a_exp'),notice:$('a_notice').value,note:v('a_note'),resumeName:resume.name,...upload})});
+      await refresh();
+    }catch(e){$('err').textContent=e.message;$('submit').disabled=false;$('submit').textContent='Submit application';return}
+    $('panel').innerHTML=`<div class="success"><h3>Application submitted</h3><p class="sub" style="line-height:1.6">Thanks ${esc(a.name)}. Your demo application for <b>${esc(j.title)}</b> has been saved in this demo. No employer has been contacted and no email has been sent.</p><div class="row" style="justify-content:center;margin-top:14px"><button class="btn b" id="fin">Continue browsing</button></div></div>`;
+    $('fin').onclick=()=>$('modal').hidden=true;
+    if(myJob&&j.id===myJob.id)advance(5);
+  };
+}
+$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').hidden=true};
+
+/* ---------- recruiter: applications ---------- */
+function renderApps(){
+  const mine=jobs.filter(j=>j.source==='HireCloud'),cnt=id=>apps.filter(a=>a.jobId===id).length;
+  $('astats').innerHTML=`<div class="tile"><small>Jobs published</small><b>${mine.length}</b></div><div class="tile"><small>Total applications</small><b>${apps.length}</b></div>`;
+  $('ajobs').innerHTML=mine.length?`<table><tr><th>Job</th><th>Location</th><th>Status</th><th>Applications</th></tr>`+mine.map(j=>`<tr><td><b>${esc(j.title)}</b><br><span class="sub">${esc(j.company)}</span></td><td>${esc(j.location)}</td><td><span class="pill">published</span></td><td>${cnt(j.id)}</td></tr>`).join('')+'</table>':'<div class="empty">No jobs yet. Create one on the Create job screen.</div>';
+  $('aapps').innerHTML=apps.length?`<table><tr><th>Candidate</th><th>Applied for</th><th>Experience</th><th>Notice</th><th>Applied</th><th>Resume</th></tr>`+apps.map(a=>`<tr><td><b>${esc(a.name)}</b><br><span class="sub">${esc(a.email)} · ${esc(a.phone)}</span></td><td>${esc(a.jobTitle)}</td><td>${esc(a.experience)}<br><span class="sub">${esc(a.company)}</span></td><td>${esc(a.notice)}</td><td>${a.appliedAt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td><td><a href="/resume/${encodeURIComponent(a.resumeFile)}" style="color:var(--plat);font-weight:600">${esc(a.resumeName)}</a><br><span class="sub">${Math.max(1,Math.round((a.resumeSize||0)/1024))} KB</span></td></tr>`).join('')+'</table>':'<div class="empty">No applications yet. Apply to the job on the career portal and it shows up here.</div>';
+}
+
+/* ---------- reset ---------- */
+function resetForm(){
+  const d={title:'Business Analyst',company:'Bright Retail Solutions',department:'Operations & Strategy',location:'Hyderabad, Telangana',experience:'3-6 years',openings:1+1};
+  Object.keys(d).forEach(k=>$(k).value=d[k]);
+  $('workMode').selectedIndex=0;$('employmentType').selectedIndex=0;$('shift').selectedIndex=0;
+  $('closingDate').value=new Date(Date.now()+30*864e5).toISOString().slice(0,10);
+  $('prompt').value=DEMO_PROMPT;['description','responsibilities','requirements','niceToHave','benefits','salaryMin','salaryMax'].forEach(k=>$(k).value='');
+}
+function resetUI(){
+  stage=1;skills=[...DEFAULT_SKILLS];variant=0;t0=Date.now();tEnd=null;myJob=null;openId=null;busy=false;
+  resetForm();renderChips();setPStep(1);$('pubView').hidden=false;$('done').hidden=true;$('draft').hidden=true;$('aiRun').hidden=true;
+  $('q').value='';$('loc').value='';$('modal').hidden=true;renderGuide();show('plat');
+}
+$('reset').onclick=async()=>{if(!confirm('Delete all demo jobs, applications and resumes?'))return;try{await api('/api/reset',{method:'POST'});resetUI();await refresh();show('plat')}catch(e){alert('Reset failed: '+e.message)}};
+resetUI();refresh().then(()=>show('plat')).catch(()=>{});
+</script>
+
+</body></html>
