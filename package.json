@@ -2,11 +2,10 @@
   "name": "jobportal-demo",
   "version": "1.0.0",
   "private": true,
-  "description": "HireCloud and JobHub synthetic recruitment demo",
+  "description": "Browser-local HireCloud / JobHub demo. No database or API keys.",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test test/*.test.js",
-    "test:e2e": "node test/e2e/local.cjs && node test/e2e/cloud-mock.cjs"
+    "test": "node test/static.cjs"
   },
   "engines": {
     "node": ">=22"
